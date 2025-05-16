@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Polaroid with Image and Letter</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script&family=Indie+Flower&display=swap');
+        
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2, #e0f7fa);
+            font-family: 'Indie Flower', cursive;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Fixed white letter styling */
+        .fixed-letter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border-radius: 3px;
+            max-width: 250px;
+            z-index: 100;
+            transform: rotate(3deg);
+            font-family: 'Dancing Script', cursive;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .fixed-letter p {
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            perspective: 1000px;
+            padding: 20px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+        
+        .polaroid {
+            background: white;
+            padding: 20px 20px 60px 20px;
+            width: 100%;
+            max-width: 350px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform: rotate(-3deg);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            border-radius: 2px;
+            box-sizing: border-box;
+        }
+        
+        .polaroid::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: -1;
+            border-radius: 2px;
+        }
+        
+        .polaroid:hover {
+            transform: rotate(0deg) scale(1.05) translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .image-container {
+            width: 100%;
+            height: 320px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, #e6f2ff, #d1e6ff, #e6f2ff);
+            border-radius: 2px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Polaroid image styling */
+        .polaroid-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 5;
+        }
+        
+        .heartbeat-bg {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+        }
+        
+        .heartbeat {
+            width: 90%;
+            height: 60px;
+            stroke: #87cefa;
+            stroke-width: 2;
+            fill: none;
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: dash 5s linear infinite;
+            opacity: 0.6;
+        }
+        
+        .heartbeat-2 {
+            position: absolute;
+            top: 10px;
+            width: 90%;
+            height: 40px;
+            stroke: #a6d4fa;
+            stroke-width: 1.5;
+            fill: none;
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: dash 7s linear infinite;
+            opacity: 0.4;
+        }
+        
+        .heartbeat-3 {
+            position: absolute;
+            bottom: 10px;
+            width: 85%;
+            height: 30px;
+            stroke: #c1e1fb;
+            stroke-width: 1;
+            fill: none;
+            stroke-dasharray: 800;
+            stroke-dashoffset: 800;
+            animation: dash 6s linear infinite;
+            opacity: 0.3;
+        }
+        
+        /* Caption text area under the image */
+        .letter-area {
+            width: 90%;
+            background: transparent;
+            border: none;
+            padding: 15px;
+            font-family: 'Dancing Script', cursive;
+            font-size: 18px;
+            color: #5bacea;
+            resize: none;
+            position: relative;
+            z-index: 10;
+            line-height: 1.5;
+            text-align: center;
+            margin-top: -5px;
+        }
+        
+        .letter-area:focus {
+            outline: none;
+        }
+        
+        @keyframes dash {
+            from {
+                stroke-dashoffset: 1000;
+            }
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.7;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.9;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.7;
+            }
+        }
+        
+        .polaroid-title {
+            font-family: 'Indie Flower', cursive;
+            color: #5bacea;
+            margin-top: 5px;
+            font-size: 22px;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.05);
+            letter-spacing: 1px;
+            text-align: center;
+            padding: 0 10px;
+            word-wrap: break-word;
+        }
+        
+        .tape {
+            position: absolute;
+            width: 80px;
+            height: 25px;
+            background-color: rgba(255, 255, 255, 0.5);
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%) rotate(2deg);
+            opacity: 0.6;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .polaroid::after {
+            content: "";
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.05), transparent);
+        }
+        
+        .date {
+            position: absolute;
+            bottom: 10px;
+            right: 20px;
+            font-size: 12px;
+            color: #aaa;
+            font-family: 'Indie Flower', cursive;
+        }
+        
+        /* Floating animation for entire container */
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+        
+        .container {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        /* Background particles */
+        .particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(135, 206, 250, 0.3);
+            animation: move 20s infinite linear;
+        }
+        
+        @keyframes move {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-1000px) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Media queries for different screen sizes */
+        @media screen and (max-width: 768px) {
+            .fixed-letter {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin: 20px auto 10px;
+                max-width: 80%;
+                transform: rotate(0deg);
+            }
+            
+            .container {
+                flex-direction: column;
+            }
+            
+            .polaroid {
+                max-width: 300px;
+                padding: 15px 15px 50px 15px;
+            }
+            
+            .image-container {
+                height: 280px;
+            }
+            
+            .polaroid-title {
+                font-size: 18px;
+            }
+            
+            body {
+                flex-direction: column;
+                padding: 20px 0;
+                justify-content: flex-start;
+            }
+        }
+        
+        @media screen and (max-width: 480px) {
+            .polaroid {
+                max-width: 260px;
+                padding: 12px 12px 45px 12px;
+            }
+            
+            .image-container {
+                height: 240px;
+            }
+            
+            .letter-area {
+                font-size: 16px;
+                padding: 10px;
+            }
+            
+            .polaroid-title {
+                font-size: 16px;
+            }
+            
+            .fixed-letter {
+                padding: 15px;
+                font-size: 14px;
+            }
+        }
+        
+        /* Layout change for landscape mode on mobile */
+        @media screen and (max-height: 600px) and (orientation: landscape) {
+            body {
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                padding: 10px;
+            }
+            
+            .fixed-letter {
+                position: relative;
+                margin: 0 20px 0 0;
+                transform: rotate(3deg);
+            }
+            
+            .container {
+                min-height: auto;
+                padding: 10px;
+            }
+            
+            .polaroid {
+                max-width: 240px;
+            }
+            
+            .image-container {
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed white letter outside the polaroid -->
+    <div class="fixed-letter">
+        <p>Dear Hun,</p>
+        <p>First of all happy monthsary alam ko na busy toyo ngayong araw at madaming school works pero hindi mo saakin pinaparamdam na mabigat ang lahat lahat thankyou kase gumagawwa ka ng way para pasayahin ako everyday at alam kong tinatry natin dahil may pangarap tayo sa isat isa thankful ako na ikaww ang  minahal ko at mamahalin ko pa ng lubos pangako ko sayo hun na ikaw lang at wala ng iba mahal na mahal kita.</p>
+        <p>With Ching,</p>
+        <p>Me</p>
+    </div>
+    
+    <div class="particles-container">
+        <!-- Particles will be added via JavaScript -->
+    </div>
+    
+    <div class="container">
+        <div class="polaroid">
+            <div class="tape"></div>
+            <div class="image-container">
+                <!-- Heartbeat animation behind the image -->
+                <div class="heartbeat-bg">
+                    <svg class="heartbeat" viewBox="0 0 600 100">
+                        <path d="M0,50 Q30,10 60,50 T120,50 T180,50 T240,50 T300,50 T360,50 T420,50 T480,50 T540,50 Q570,90 600,50"></path>
+                    </svg>
+                    <svg class="heartbeat-2" viewBox="0 0 600 100">
+                        <path d="M0,50 Q50,20 100,50 T200,50 T300,50 T400,50 T500,50 Q550,80 600,50"></path>
+                    </svg>
+                    <svg class="heartbeat-3" viewBox="0 0 600 100">
+                        <path d="M0,50 Q45,30 90,50 T180,50 T270,50 T360,50 T450,50 Q525,70 600,50"></path>
+                    </svg>
+                </div>
+                
+                <!-- Actual image in the polaroid -->
+                <img class="polaroid-image" src="bf.jpg" alt="Beautiful moment" />
+            </div>
+            
+            <!-- Caption area under the image -->
+            <textarea class="letter-area" placeholder="HAPPY 26 MONTHSARY HUN!!"></textarea>
+            <div class="polaroid-title">ILOVEYOUALWAYS! IM SO HAPPY WE'VE MADE IT TOGETHER UP TO THIS DAY!!!</div>
+            <div class="date" id="current-date"></div>
+        </div>
+    </div>
+
+    <script>
+        // Add current date
+        const dateElem = document.getElementById('current-date');
+        const options = { year: 'numeric', month: 'short', day: 'numeric' };
+        dateElem.textContent = new Date().toLocaleDateString(undefined, options);
+        
+        // Create particles
+        const particlesContainer = document.querySelector('.particles-container');
+        const particleCount = 30;
+        
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            
+            // Random size between 3px and 10px
+            const size = Math.random() * 7 + 3;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            
+            // Random position
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.top = `${Math.random() * 100}%`;
+            
+            // Random opacity and color
+            const opacity = Math.random() * 0.3 + 0.1;
+            const hue = Math.random() * 20 + 190; // Pastel blue range
+            particle.style.backgroundColor = `hsla(${hue}, 80%, 75%, ${opacity})`;
+            
+            // Random animation duration and delay
+            const duration = Math.random() * 30 + 10;
+            const delay = Math.random() * 20;
+            particle.style.animationDuration = `${duration}s`;
+            particle.style.animationDelay = `${delay}s`;
+            
+            particlesContainer.appendChild(particle);
+        }
+        
+        // Make the textarea auto-resize based on content
+        const textarea = document.querySelector('.letter-area');
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            const maxHeight = 60; // Maximum height for caption
+            this.style.height = Math.min(this.scrollHeight, maxHeight) + 'px';
+        });
+        
+        // Check if device is in landscape mode and adjust layout
+        function checkOrientation() {
+            if (window.innerHeight < 600 && window.innerWidth > window.innerHeight) {
+                document.body.classList.add('landscape');
+            } else {
+                document.body.classList.remove('landscape');
+            }
+        }
+        
+        // Run on page load and when orientation changes
+        window.addEventListener('load', checkOrientation);
+        window.addEventListener('resize', checkOrientation);
+    </script>
+</body>
+</html>
